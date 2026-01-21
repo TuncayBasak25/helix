@@ -1,154 +1,96 @@
 # Helix — Overview
 
-Helix is a runtime framework built around a simple principle:
+Helix is a runtime framework that treats **structure, access, and execution**
+as explicit, statically verifiable concepts.
 
-**existence, access, and execution must be explicit and statically verifiable.**
+Rather than inferring behavior at runtime, Helix requires systems to declare
+what can exist, what can be accessed, and where execution is allowed to happen.
+This information is validated as early as possible using Rust’s type system.
 
-Instead of relying on implicit runtime behavior or dynamic queries, Helix uses
-Rust’s type system to describe what can exist, what can interact, and where
-execution is allowed to happen.
-
-The goal is to make system structure clear, predictable, and robust by design.
-
----
-
-## What Helix models
-
-At a high level, Helix models five fundamental concepts:
-
-- **Components** — data or tags
-- **Kinds** — what kinds of instances can exist
-- **Queries** — what a system intends to access or control
-- **Systems** — pure logic operating over declared intent
-- **Contexts** — explicit execution boundaries
-
-Together, these concepts form a closed and explicit execution model.
+The result is a model that favors predictability and clarity over implicit
+behavior and hidden rules.
 
 ---
 
-## Components
+## The model
 
-A **Component** represents either:
-- a piece of data, or
-- a marker (tag) whose presence alone is meaningful.
+Helix is built around five core concepts:
 
-Components are declared explicitly and attached to instances through kinds.
+- **[Components](concepts/components.md)** represent data or markers.
+- **[Kinds](concepts/kinds.md)** describe the structure of instances.
+- **[Queries](concepts/queries.md)** declare access and intent.
+- **[Systems](concepts/systems.md)** implement behavior.
+- **[Contexts](concepts/contexts.md)** define execution boundaries.
 
-From the user’s perspective, data components and marker components are both
-*components*, even though they differ internally in how they are represented
-and accessed.
-
-Components do not contain behavior.
-
----
-
-## Kinds
-
-A **Kind** defines a *static description* of what a certain type of instance is.
-
-A kind specifies:
-- which components are present
-- whether components are mutable or immutable
-- whether components are required or optional
-- which tags are possible, always present or always absent
-
-In other words, a kind answers the question:
-
-> **“What kind of thing can exist?”**
-
-Kinds define *possibility*, not execution.  
-They do not create instances by themselves.
+Each concept has a single responsibility.
+Their interaction defines the runtime behavior.
 
 ---
 
-## Queries
+## Separation of concerns
 
-A **Query** is a *compile-time access contract*.
+Helix enforces a strict separation between:
 
-It describes:
-- which components or tags are required
-- how they are accessed (read-only, mutable, optional, etc.)
-- which structural conditions must be satisfied
+- **what exists** — defined by *kinds*
+- **what can be accessed** — defined by *queries*
+- **what logic exists** — implemented in *systems*
+- **where execution happens** — defined by *contexts*
 
-Queries do not care about *how* data is stored internally.
-They only express **intent and eligibility**.
-
-Queries are used by systems to declare what they need, and by Helix to validate
-that this intent is compatible with the kinds and contexts in which the system
-is allowed to run.
-
-Conceptually, queries play a role similar to:
-- structural typing
-- trait-based grouping
-- or explicit capability declarations
+No concept overlaps in responsibility.
+Nothing exists or executes implicitly.
 
 ---
 
-## Systems
+## Execution philosophy
 
-A **System** is pure logic.
+Systems never decide:
+- where they run
+- when they run
+- what data exists
 
-It:
-- operates only on declared queries
-- has no implicit access to global state
-- cannot access undeclared data
+Contexts never contain business logic.
 
-Whether a system can run depends entirely on:
-- the queries it declares
-- the kinds present in a context
-- the context’s execution rules
-
-Systems do not decide *when* or *where* they run.
+Execution is always explicit and intentional:
+systems are executed only when a context invokes them.
 
 ---
 
-## Contexts
+## Validation
 
-A **Context** is a complete execution boundary.
+Helix validates structural correctness at compile time whenever possible.
 
-A context defines:
-- which kinds are allowed to exist
-- which systems are allowed to run
-- how execution is structured (e.g. lifecycle, ownership, threading)
+This includes:
+- compatibility between *queries* and *kinds*
+- system eligibility within a *context*
+- enforcement of execution boundaries
 
-All execution in Helix happens inside a context.
-
-A context answers the question:
-
-> **“What exists here, and what is allowed to execute?”**
-
-Contexts make execution boundaries explicit and prevent accidental coupling
-between unrelated parts of the system.
+Runtime behavior follows directly from these validated declarations.
 
 ---
 
-## How Helix is used
+## Scope
 
-Helix is not a framework you “run”.
-
-It is a framework you **define against**.
-
-Users declare:
-- components
-- kinds
-- queries
-- systems
-- contexts
-
-Helix validates these declarations at compile time and provides a minimal
-runtime to execute them according to the declared structure.
-
----
-
-## What Helix does not do
-
-Helix deliberately avoids:
+Helix does not provide:
 - implicit scheduling
-- hidden execution order
-- global mutable state
-- application-specific concerns
+- automatic system ordering
+- hidden global state
+- domain-specific abstractions
 
-Those decisions are left explicit and under user control.
+It provides a small, explicit core that can be used to build
+game engines, simulations, servers, or other runtime-driven systems.
+
+---
+
+## Reading guide
+
+This documentation is organized by concept.
+Each core concept has a dedicated document and is linked inline when referenced.
+
+A typical reading order is:
+**Components → Kinds → Queries → Systems → Contexts**
+
+Details about execution semantics are described in the
+**[Execution Model](execution-model.md)**.
 
 ---
 
@@ -156,5 +98,5 @@ Those decisions are left explicit and under user control.
 
 Helix is a personal project and a work in progress.
 
-The overall model and direction are stable, while internal implementation
-details continue to evolve as the design is refined.
+The conceptual model is stable.
+Implementation details evolve as the design is refined.
