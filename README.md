@@ -1,95 +1,88 @@
 # Helix
 
-Helix is an experimental runtime framework written in Rust, focused on **static
-correctness**, **robust execution models**, and **minimal runtime overhead**.
+Helix is an experimental runtime framework written in Rust.
 
-Its goal is to explore how far compile-time knowledge and type-driven design can be
-pushed to reduce runtime checks, make invalid states unrepresentable, and enforce
-explicit system boundaries.
+It focuses on making **structure, access, and execution explicit and statically
+verifiable**, using Rust’s type system as the primary source of correctness.
 
----
-
-## Motivation
-
-Many existing frameworks rely heavily on runtime queries, dynamic checks, or implicit
-behavior to provide flexibility. While powerful, this often makes invalid states
-representable and shifts error detection to runtime.
-
-Helix explores a different direction:
-- encode execution rules and access constraints in the type system
-- favor explicitness over magic
-- detect structural errors as early as possible (ideally at compile time)
+Helix is designed around clarity, predictability, and explicit control,
+rather than implicit behavior or runtime inference.
 
 ---
 
-## Core concepts
+## Core idea
 
-Helix is built around a small set of explicit concepts:
+Helix models execution as the interaction of a small set of explicit concepts:
 
-- **Components**: pure data or marker types
-- **Queries**: statically defined access contracts over components
-- **Kinds**: static descriptions of entity layouts
-- **Systems**: pure logic operating over explicit queries
-- **Contexts**: explicit execution boundaries
+- **[Components](docs/concepts/components.md)** — data or marker types
+- **[Kinds](docs/concepts/kinds.md)** — static descriptions of what can exist
+- **[Queries](docs/concepts/queries.md)** — access and intent contracts
+- **[Systems](docs/concepts/systems.md)** — pure logic
+- **[Contexts](docs/concepts/contexts.md)** — execution boundaries
 
-These concepts are designed so that incompatible combinations fail to compile, and
-runtime behavior remains explicit and predictable.
+Each concept has a single, well-defined responsibility.
+Their interaction defines the execution model.
 
 ---
 
-## Example (simplified)
+## What Helix is
 
-```rust
-#[component]
-struct Position(Vec2);
+Helix is a framework where:
 
-#[component]
-struct Velocity(Vec2);
+- existence is declared explicitly through *kinds*
+- access is declared explicitly through *queries*
+- behavior is implemented in *systems*
+- execution happens only inside *contexts*
 
-#[query]
-struct Movable(
-    HasMut<Position>,
-    Has<Velocity>,
-);
+Nothing exists, runs, or interacts implicitly.
 
-#[system]
-fn apply_velocity(entity: Movable) {
-    entity.position_mut() += entity.velocity();
-}
-```
-In this example:
+---
 
-- the query explicitly defines which components are accessed and how
+## What Helix is not
 
-- mutation and read-only access are distinguished at the type level
+Helix does not:
+- infer execution order
+- schedule systems implicitly
+- hide ownership or access rules
+- couple application logic to a specific domain
 
-- the system logic is pure and cannot access undeclared data
+All execution is intentional and visible.
 
-Invalid access patterns or incompatible entity layouts are rejected at compile time.
+---
 
-Execution model
-Systems do not run implicitly. They are executed inside a Context, which defines:
+## Usage philosophy
 
-- which kinds of entities exist
+Helix is not a framework you “run”.
 
-- which systems are allowed to run
+It is a framework you **define against**.
 
-- the execution boundary (e.g. thread ownership)
+Users describe:
+- which components exist
+- which kinds are possible
+- which systems are available
+- which contexts execute them
 
-This makes execution order and boundaries explicit by design.
+Helix validates these definitions at compile time and provides a minimal
+runtime to execute them.
 
-Status
+---
+
+## Status
+
 Helix is a personal project and a work in progress.
-The core ideas and syntax are stable, while internal implementation details are still
-being refined.
 
-The current focus is on:
+The core model and direction are stable.
+Implementation details continue to evolve as the design is refined.
 
-- validating the type-level model
+---
 
-- refining ergonomics and compile-time diagnostics
+## Documentation
 
-- keeping the runtime minimal and predictable
-
-License
-MIT
+- [Overview](docs/overview.md)
+- [Components](docs/concepts/components.md)
+- [Kinds](docs/concepts/kinds.md)
+- [Queries](docs/concepts/queries.md)
+- [Systems](docs/concepts/systems.md)
+- [Contexts](docs/concepts/contexts.md)
+- [Execution model](docs/execution-model.md)
+- [Design decisions](docs/design-decisions.md)
