@@ -1,86 +1,83 @@
 # Components
 
-A **Component** represents a unit of information that can be attached to an
-instance in Helix.
+A **Component** represents a unit of data or a marker that can be attached to an instance.
 
-From the user’s perspective, a component is simply:
-- a named piece of data, or
-- a named marker whose presence alone is meaningful.
-
-Components are declared explicitly and do not contain behavior.
+Components describe *what data exists*, but not *how it is accessed*,
+*how it is stored*, or *how it is used*.
 
 ---
 
-## Data components
+## Role of components
 
-A **data component** carries a value.
+Components are the smallest building blocks in Helix.
+
+They are used to:
+- describe the data carried by instances
+- express capabilities or properties through markers
+- serve as the basis for structural definitions and access contracts
+
+Components are passive.
+They do not contain behavior and do not execute.
+
+---
+
+## Data and marker components
+
+Helix distinguishes between two kinds of components:
+
+### Data components
+
+Data components carry values.
+
+They represent structured data that systems may read or mutate,
+depending on declared access.
+
+### Marker components
+
+Marker components carry no data.
+
+Their presence or absence is meaningful by itself and is typically used
+to express properties, states, or capabilities.
+
+Marker components are treated as first-class components,
+even though they do not store values.
+
+---
+
+## Declaration
+
+Components are declared explicitly using the `#[component]` attribute.
 
 ```rust
 #[component]
-struct Health(f32);
-```
+struct Position(f32, f32);
 
-In this example, `Health` is a component holding a `f32` value.
-
-Data components represent state.
-They are accessed by systems through queries and never act on their own.
-
----
-
-## Marker components
-
-A **marker component** (or tag) carries no data.
-
-```rust
 #[component]
-struct Broken;
+struct Grounded;
 ```
 
-For marker components, only presence or absence matters.
-
-Markers are typically used to:
-- express state flags
-- classify instances
-- enable or disable behavior through queries
-
----
-
-## Unified concept
-
-Although data components and marker components differ internally,
-they are treated uniformly at the Helix interaction level.
-
-Both are:
-- declared the same way
-- attached to kinds
-- accessed through queries
-- validated statically
-
-This allows systems to reason about structure and intent without
-depending on representation details.
-
----
-
-## Components and behavior
-
-Components never contain logic.
-
-All behavior in Helix lives in **systems**, which operate on components
-through explicitly declared queries.
-
-This separation ensures that:
-- data remains passive
-- access rules are explicit
-- behavior is centralized and predictable
+This declaration defines a component type.
+It does not determine where the component exists or how it is accessed.
 
 ---
 
 ## What components do not define
 
 Components do not define:
-- how they are stored
-- how many instances exist
-- when or where they are accessed
-- how execution happens
+- how instances are structured
+- whether a component is optional or required
+- whether a component is mutable or immutable
+- how components are accessed
+- where components exist
 
-Those concerns are handled by kinds, queries, systems, and contexts.
+These aspects are defined by **[Kinds](kinds.md)**,
+**[Queries](queries.md)**, and **[Contexts](contexts.md)**.
+
+---
+
+## Summary
+
+- Components represent data or markers
+- Components are passive and declarative
+- Components do not define structure or behavior
+- Components are used by other concepts to express meaning
