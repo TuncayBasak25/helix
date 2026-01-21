@@ -40,7 +40,7 @@ Execution is controlled by **[Contexts](contexts.md)**.
 
 Kinds are declared explicitly using the `#[kind]` attribute.
 
-\`\`\`rust
+```rust
 #[kind]
 struct Player(
     Has<Id>,
@@ -48,7 +48,7 @@ struct Player(
     Opt<Inventory>,
     Maybe<Grounded>,
 );
-\`\`\`
+```
 
 This declaration describes which components may exist on an instance
 and under which access and presence rules.
