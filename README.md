@@ -56,7 +56,7 @@ struct Movable(
 fn apply_velocity(entity: Movable) {
     entity.position_mut() += entity.velocity();
 }
-
+```
 In this example:
 
 the query explicitly defines which components are accessed and how
