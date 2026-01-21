@@ -1,46 +1,55 @@
 # Queries
 
-A **Query** defines a compile-time access contract in Helix.
+A **Query** is a compile-time contract that declares access and eligibility.
 
-It describes what a system *intends* to access or control, without describing
-how data is stored or how execution happens.
-
-A query answers the question:
-
-> “What does this system need, and under which conditions?”
+Queries describe *what a system is allowed to access* and *which instances it
+may operate on*, without defining execution or iteration behavior.
 
 ---
 
 ## Role of queries
 
 Queries are used to:
-- declare access to components and tags
-- express mutability and optionality
-- define eligibility rules for systems
-- group kinds by structural capability
+- declare component access (read or write)
+- express presence requirements
+- restrict system eligibility
+- define structural compatibility
 
-Queries do not describe structure.
-They describe **intent and access**.
-
----
-
-## Queries and kinds
-
-A query does not target a specific kind.
-
-Instead, it is matched **structurally** against kinds.
-
-A kind is eligible for a query if it satisfies all the query’s declared
-requirements.
-
-This allows:
-- grouping different kinds under a common behavior
-- separating instances of the same kind into different behavioral sets
-- expressing capability-based logic
+Queries do not execute logic.
+They do not iterate instances.
+They do not control execution.
 
 ---
 
-## Declaring a query
+## Access contracts
+
+A query specifies how a system intends to access components.
+
+This includes:
+- which **[Components](components.md)** are required
+- whether access is immutable or mutable
+- whether a component must be present or may be optional
+
+Access rules are validated against **[Kinds](kinds.md)** at compile time
+whenever possible.
+
+---
+
+## Structural matching
+
+Queries match instances *structurally*.
+
+An instance is eligible if:
+- its **[Kind](kinds.md)** declares compatible components
+- required access modes are satisfied
+- required marker components are present in the expected state
+
+Queries do not match absence.
+All requirements are explicit and positive.
+
+---
+
+## Declaration
 
 Queries are declared explicitly using the `#[query]` attribute.
 
@@ -52,116 +61,53 @@ struct Movable(
 );
 ```
 
-This query declares that:
-- `Position` must be present and accessed mutably
-- `Velocity` must be present and accessed immutably
+This declaration defines a reusable access contract.
 
-Any kind satisfying these requirements is eligible for this query.
+It does not describe iteration, ordering, or execution.
 
 ---
 
-## Access modifiers
+## Queries and systems
 
-Queries express access rules using explicit modifiers.
+A **[System](systems.md)** may:
+- declare one or more queries
+- become eligible for a **[Context](contexts.md)** based on those queries
 
-### Required components
-
-- `Has<T>`  
-  Requires component `T` to be present and accessed immutably.
-
-- `HasMut<T>`  
-  Requires component `T` to be present and accessed mutably.
+Eligibility is passive.
+A system never runs because of a query alone.
 
 ---
 
-### Optional components
+## Queries and kinds
 
-- `Opt<T>`  
-  Component `T` may or may not be present. Access is read-only.
+Queries are validated against **[Kinds](kinds.md)**.
 
-- `OptMut<T>`  
-  Component `T` may or may not be present. Access is mutable.
+A query is compatible with a kind if:
+- all required components exist on the kind
+- access modes are compatible
+- marker requirements are satisfied
 
-`OptMut<T>` expresses *optional access* and does not imply any specific
-storage model.
-
----
-
-### Structural mutation
-
-- `SparseMut<T>`
-
-`SparseMut<T>` expresses **structural mutation intent**.
-
-It allows:
-- inserting the component
-- removing the component
-
-This modifier only matches kinds where the component is declared as optional
-and structurally mutable.
-
-Unlike `OptMut<T>`, `SparseMut<T>` does not match dense components and
-explicitly requires a sparse representation.
-
----
-
-### Marker components (tags)
-
-Queries can express conditions on marker components.
-
-- `Is<Tag>`  
-  Requires the tag to be present and active.
-
-- `Not<Tag>`  
-  Requires the tag to be present and inactive.
-
-- `Maybe<Tag>`  
-  The system explicitly handles whether the tag is present or not.
-
-- `MaybeMut<Tag>`  
-  Allows checking and mutating the tag’s presence when supported.
-
----
-
-## Structural intent
-
-Queries are intentionally **structural**, not nominal.
-
-They resemble:
-- trait bounds
-- capability-based typing
-- structural interfaces
-
-A query defines *what a system can work with*, not *what it works on*.
-
----
-
-## Query types
-
-At a conceptual level, Helix distinguishes between:
-- **instance queries**, which operate on entity instances
-- **context queries**, which operate on context-level capabilities
-
-A query is always one or the other.
+Incompatible queries result in compile-time errors whenever possible.
 
 ---
 
 ## What queries do not define
 
 Queries do not define:
-- storage layout
-- iteration order
-- execution timing
-- scheduling
-- instance creation
+- how many instances are processed
+- how instances are iterated
+- execution order
+- system scheduling
+- context boundaries
 
-Those concerns are handled elsewhere in the model.
+These concerns belong to **[Systems](systems.md)** and
+**[Contexts](contexts.md)**.
 
 ---
 
 ## Summary
 
-- A query defines an access contract
-- Queries express intent, not structure
-- Queries are matched structurally against kinds
-- Queries enable static validation of system behavior
+- Queries declare access and eligibility
+- Queries are structural and static
+- Queries do not execute or iterate
+- Queries restrict where systems may run
